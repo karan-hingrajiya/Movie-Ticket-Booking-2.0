@@ -4,7 +4,7 @@ import ApiError from "../utils/api-error.js";
 let transporter;
 const nodeEnv = process.env.NODE_ENV || process.env.NODE_env || "development";
 
-const appName = process.env.APP_NAME || "kauth";
+const appName = process.env.APP_NAME || "ZohoCine";
 
 const getAppUrl = () => {
     return process.env.APP_URL || `http://localhost:${process.env.PORT || 5000}`;
@@ -159,14 +159,19 @@ const getTransporter = () => {
             },
         });
     } else {
+    const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
+    const gmailPort = Number(process.env.GMAIL_PORT || 587);
     transporter = nodemailer.createTransport({
-        host: process.env.GMAIL_HOST,
-        port: Number(process.env.GMAIL_PORT),
-        secure: Number(process.env.GMAIL_PORT) === 465, //STARTTLS uses if false otherwise SSL/TLS
+        host: gmailHost,
+        port: gmailPort,
+        secure: gmailPort === 465, // STARTTLS on 587, SSL/TLS on 465
         auth: {
             user: process.env.GMAIL_USER,
             pass: process.env.GMAIL_PASSWORD,
         },
+        connectionTimeout: 15000,
+        greetingTimeout: 10000,
+        socketTimeout: 20000,
     });
     }
 
@@ -183,7 +188,10 @@ const verifyTransporter = async () => {
 }
 
 const sendEmail = async ({to,subject,html,text}) => {
-    const from = process.env.MAIL_FROM || process.env.GMAIL_USER || process.env.MAILTRAP_USER;
+    const from =
+      nodeEnv === "development"
+        ? process.env.MAIL_FROM || process.env.MAILTRAP_USER || process.env.GMAIL_USER
+        : process.env.GMAIL_USER || process.env.MAIL_FROM || process.env.MAILTRAP_USER;
     const info = await getTransporter().sendMail({
         from : `"${appName}" <${from}>`,
         to,

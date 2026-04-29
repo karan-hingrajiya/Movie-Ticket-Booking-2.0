@@ -55,6 +55,7 @@ export const registerUser = async (payload) => {
     await verificationEmail(userDoc.email, rawToken);
   } catch (err) {
     await User.deleteOne({ _id: result.insertedId });
+    console.error("Failed to send verification email:", err.message);
     throw ApiError.badRequest("failed to send verification email");
   }
 
