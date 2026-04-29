@@ -242,6 +242,9 @@ const sendEmail = async ({to,subject,html,text}) => {
       const isIpv6RouteIssue =
         error?.code === "ENETUNREACH" ||
         String(error?.message || "").includes("ENETUNREACH");
+      const isTimeoutIssue =
+        error?.code === "ETIMEDOUT" ||
+        String(error?.message || "").toLowerCase().includes("timeout");
 
       if (nodeEnv !== "development" && isIpv6RouteIssue) {
         const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
@@ -270,6 +273,30 @@ const sendEmail = async ({to,subject,html,text}) => {
         } else {
           throw error;
         }
+      } else if (nodeEnv !== "development" && isTimeoutIssue) {
+        const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
+        const configuredPort = Number(process.env.GMAIL_PORT || 587);
+        const fallbackPort = configuredPort === 587 ? 465 : 587;
+        const ipv4List = await resolve4(gmailHost).catch(() => []);
+        const retryHost = ipv4List?.[0] || gmailHost;
+
+        // #region agent log
+        fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:timeout-retry',message:'Retrying SMTP on alternate port after timeout',data:{gmailHost,retryHost,configuredPort,fallbackPort},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+
+        const retryTransporter = createSmtpTransport({
+          host: retryHost,
+          port: fallbackPort,
+          forceIpv4: retryHost !== gmailHost,
+        });
+
+        info = await retryTransporter.sendMail({
+          from: `"${appName}" <${from}>`,
+          to,
+          subject,
+          html,
+          text,
+        });
       } else {
         throw error;
       }
