@@ -1,0 +1,855 @@
+/* ================================================================
+   STRUCTURE.CSS — ZohoCine Shared Design System  v2.0
+   ================================================================
+   HOW TO USE ON EVERY NEW PAGE:
+     <link rel="stylesheet" href="../styles/structure.css">
+     <link rel="stylesheet" href="../styles/your-page.css">
+
+   SECTIONS:
+     1.  Design tokens
+     2.  Dark-mode token overrides
+     3.  Reset & base typography
+     4.  Button components        (.btn, .btn-primary …)
+     5.  Form field system        (.field, .field__control, .field__error …)
+     6.  Primary button           (.primary-button, .button__loader)
+     7.  Password strength meter  (.strength-meter …)
+     8.  Form status message      (.form-status)
+     9.  Panel heading            (.panel-heading)
+     10. Glass card               (.glass-card)
+     11. Badge                    (.badge)
+     12. Icon button              (.icon-button)
+     13. Dark-mode toggle         (.dark-toggle)
+     14. Keyframe library
+     15. Animation utilities
+     16. Layout utilities
+     17. Reduced motion
+   ================================================================ */
+
+
+/* ── 1. Design Tokens ─────────────────────────────────────────── */
+:root {
+  --ink:         #101014;
+  --paper:       #f8f3ea;
+  --muted:       #7b776f;
+  --line:        rgba(16, 16, 20, 0.12);
+  --accent:      #e84f3d;
+  --accent-dark: #b72c24;
+  --gold:        #f4b544;
+  --teal:        #32b7a7;
+  --success:     #16875f;
+  --danger:      #c73c35;
+  --panel:       rgba(255, 252, 246, 0.92);
+  --shadow:      0 30px 90px rgba(16, 16, 20, 0.22);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --font: "Inter", Arial, sans-serif;
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+}
+
+
+/* ── 2. Dark-Mode Token Overrides ─────────────────────────────── */
+html.dark {
+  --ink:     #e8e4df;
+  --paper:   #0f172a;
+  --muted:   #9ca3af;
+  --line:    rgba(255, 255, 255, 0.09);
+  --panel:   rgba(12, 18, 36, 0.94);
+  --shadow:  0 30px 90px rgba(0, 0, 0, 0.72);
+  --success: #22a472;
+  --accent:  #f0604d;
+}
+
+
+/* ── 3. Reset & Base ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(244,181,68,0.08), transparent 30%),
+    radial-gradient(circle at 85% 15%, rgba(50,183,167,0.08), transparent 30%),
+    linear-gradient(135deg, #07070b 0%, #0d0b12 45%, #0c1422 100%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 4rem); }
+h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.5rem); }
+
+p   { color: var(--muted); line-height: 1.7; }
+a   { color: inherit; text-decoration: none; transition: color 0.2s ease; }
+button, input { font: inherit; }
+
+
+/* ── 4. Button Components (.btn-*) ───────────────────────────── */
+/* Used by home page nav / CTA.                                   */
+/* Form submit buttons use .primary-button  (section 6).         */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 14px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: translateZ(0);
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  color: #fffaf0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  box-shadow: 0 16px 36px rgba(232, 79, 61, 0.3);
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: translateX(-120%);
+  transition: transform 500ms ease;
+}
+
+.btn-primary:hover                { transform: translateY(-2px) translateZ(0); box-shadow: 0 22px 50px rgba(232,79,61,0.4); }
+.btn-primary:hover::before        { transform: translateX(120%); }
+
+.btn-secondary {
+  border: 1px solid var(--line);
+  padding: 14px 20px;
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn-secondary:hover              { background: rgba(16,16,20,0.06); border-color: var(--gold); }
+html.dark .btn-secondary:hover    { background: rgba(255,255,255,0.08); }
+
+.btn-ghost { background: transparent; color: var(--muted); padding: 10px 16px; }
+.btn-ghost:hover                  { color: var(--ink); background: rgba(16,16,20,0.06); }
+html.dark .btn-ghost:hover        { background: rgba(255,255,255,0.08); }
+
+
+/* ── 5. Form Field System ─────────────────────────────────────── */
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  color: var(--ink);
+}
+
+.field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.68);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  overflow: hidden;
+}
+
+html.dark .field__control       { background: rgba(255,255,255,0.05); }
+
+.field__control:focus-within {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(50,183,167,0.15);
+}
+
+html.dark .field__control:focus-within {
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 0 0 4px rgba(50,183,167,0.22);
+}
+
+/* Error state — JS adds .has-error to .field wrapper */
+.field.has-error .field__control {
+  border-color: rgba(199, 60, 53, 0.72);
+  box-shadow: 0 0 0 4px rgba(199, 60, 53, 0.1);
+}
+
+.field input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 0 16px;
+  color: var(--ink);
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.field input::placeholder       { color: #aaa39a; }
+html.dark .field input::placeholder { color: #4e5668; }
+
+/* Extra right-padding when eye-toggle sits inside the control */
+.field__control--password input { padding-right: 58px; }
+
+/* Error message text beneath field */
+.field__error {
+  min-height: 18px;
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+
+/* ── 6. Primary Button (form submit) ──────────────────────────── */
+
+.primary-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  width: 100%;
+  padding: 0 24px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: #fffaf0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  box-shadow: 0 16px 36px rgba(232, 79, 61, 0.3);
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms;
+}
+
+.primary-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: translateX(-120%);
+  transition: transform 500ms ease;
+}
+
+.primary-button:hover          { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(232,79,61,0.4); }
+.primary-button:hover::before  { transform: translateX(120%); }
+.primary-button:active         { transform: translateY(0); box-shadow: 0 10px 24px rgba(232,79,61,0.28); }
+.primary-button:disabled       { cursor: wait; opacity: 0.75; transform: none; }
+
+.button__text {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+  Spinning ring inside the button while loading.
+  IMPORTANT: the initial transform is translateY(-50%) to vertically
+  centre the ring. The spin-loader keyframe must INCLUDE translateY(-50%)
+  at both ends — otherwise the ring jumps to the top of the button the
+  moment the animation starts and the centering is lost.
+*/
+.button__loader {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-top-color: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 200ms;
+}
+
+.primary-button.is-loading .button__loader {
+  opacity: 1;
+  animation: spin-loader 700ms linear infinite;
+}
+
+
+/* ── 7. Password Strength Meter ───────────────────────────────── */
+
+.strength-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(16, 16, 20, 0.1);
+}
+
+html.dark .strength-meter { background: rgba(255,255,255,0.08); }
+
+.strength-meter__bar {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #aaa39a;
+  transition: width 260ms var(--ease-out), background 260ms ease;
+}
+
+.strength-meter__bar[data-strength="weak"]   { background: var(--danger); }
+.strength-meter__bar[data-strength="good"]   { background: var(--gold);   }
+.strength-meter__bar[data-strength="strong"] { background: var(--success);}
+
+.strength-meter__text {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+
+/* ── 8. Form Status Message ───────────────────────────────────── */
+
+.form-status {
+  min-height: 22px;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--muted);
+  transition: color 200ms;
+}
+
+.form-status[data-type="success"] { color: var(--success);      }
+.form-status[data-type="error"]   { color: var(--danger);       }
+.form-status[data-type="loading"] { color: var(--accent-dark);  }
+
+
+/* ── 9. Panel Heading ─────────────────────────────────────────── */
+
+.panel-heading { margin-bottom: 28px; }
+
+.panel-heading p {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+
+/* ── 10. Glass Card ───────────────────────────────────────────── */
+
+.glass-card {
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+html.dark .glass-card {
+  border-color: rgba(255,255,255,0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    var(--shadow),
+    0 0 0 1px rgba(244,181,68,0.07),
+    inset 0 0 40px rgba(244,181,68,0.025);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: 0 40px 100px rgba(16,16,20,0.28);
+}
+
+
+/* ── 11. Badge ────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(244,181,68,0.15);
+  color: var(--gold);
+  border-radius: 20px;
+}
+
+html.dark .badge { background: rgba(244,181,68,0.12); }
+
+
+/* ── 12. Icon Button ──────────────────────────────────────────── */
+
+.icon-button {
+  position: absolute;
+  right: 8px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 150ms, background 150ms;
+}
+
+/* icon-button SVG uses fill (eye icon is fill-based) */
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible              { color: var(--ink); background: rgba(16,16,20,0.06); }
+html.dark .icon-button:hover,
+html.dark .icon-button:focus-visible    { background: rgba(255,255,255,0.08); }
+
+
+/* ── 13. Dark-Mode Toggle ─────────────────────────────────────── */
+
+.dark-toggle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color        150ms,
+    background   150ms,
+    border-color 150ms,
+    transform    200ms var(--ease-bounce);
+}
+
+.dark-toggle:hover              { color: var(--ink); background: rgba(16,16,20,0.06); transform: rotate(18deg); }
+html.dark .dark-toggle:hover    { background: rgba(255,255,255,0.08); }
+
+/*
+  Base SVG rule — stroke-based (used by login + register icons).
+  Pages that use fill-based icons (home.html) override this in
+  their own CSS file. See home.css → "Dark-toggle SVG fix".
+*/
+.dark-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.dark-toggle .icon-sun              { display: none;  }
+.dark-toggle .icon-moon             { display: block; }
+html.dark .dark-toggle .icon-sun    { display: block; }
+html.dark .dark-toggle .icon-moon   { display: none;  }
+
+
+/* ── 14. Keyframe Library ─────────────────────────────────────── */
+
+/*
+  spin-loader — used by .button__loader
+  MUST keep translateY(-50%) so the ring stays vertically centred.
+  Plain rotate() would cause the ring to jump to y=0 mid-animation.
+*/
+@keyframes spin-loader {
+  from { transform: translateY(-50%) rotate(0deg);   }
+  to   { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Generic rotation (reel decoration, etc.) */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Gentle float up/down */
+@keyframes float {
+  0%, 100% { transform: translateY(0)     translateZ(0); }
+  50%      { transform: translateY(-14px) translateZ(0); }
+}
+
+/* Register page — ticket stack float */
+@keyframes floatTicket {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+
+/* Login page — film-strip vertical scroll */
+@keyframes film-scroll {
+  from { transform: translateY(0);    }
+  to   { transform: translateY(-50%); }
+}
+
+/* Star/sparkle twinkling */
+@keyframes twinkle {
+  0%,  100% { opacity: 1;    transform: scale(1);    }
+  40%       { opacity: 0.15; transform: scale(0.45); }
+  70%       { opacity: 0.85; transform: scale(1.12); }
+}
+
+/* Film reel spin */
+@keyframes reel-turn {
+  to { transform: rotate(360deg); }
+}
+
+/* Glow ring breath */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1;   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   }
+  50%      { opacity: 0.5; }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-leave {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+
+/* ── 15. Animation Utilities ──────────────────────────────────── */
+
+.animate-fade-in       { animation: fadeIn       0.5s ease           forwards; }
+.animate-fade-in-up    { animation: fadeInUp     0.6s ease           forwards; }
+.animate-fade-in-left  { animation: fadeInLeft   0.6s ease           forwards; }
+.animate-fade-in-right { animation: fadeInRight  0.6s ease           forwards; }
+.animate-scale-in      { animation: scaleIn      0.5s ease           forwards; }
+.animate-float         { animation: float        6s  ease-in-out     infinite; }
+.animate-pulse         { animation: pulse        2s  ease-in-out     infinite; }
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+/* Scroll-reveal — JS adds .visible via IntersectionObserver */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html.dark .animate-float { animation-duration: 10s; }
+
+
+/* Notifications */
+.app-notifications {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(380px, calc(100vw - 24px));
+  pointer-events: none;
+}
+
+.app-toast {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 252, 246, 0.96);
+  box-shadow: 0 24px 48px rgba(16, 16, 20, 0.18);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+  animation: toast-enter 220ms var(--ease-out);
+}
+
+html.dark .app-toast {
+  background: rgba(12, 18, 36, 0.96);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.38);
+}
+
+.app-toast.is-leaving {
+  animation: toast-leave 220ms ease forwards;
+}
+
+.app-toast__icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(16, 16, 20, 0.06);
+}
+
+html.dark .app-toast__icon {
+  background: rgba(255,255,255,0.06);
+}
+
+.app-toast__icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-toast__body {
+  min-width: 0;
+}
+
+.app-toast__title {
+  margin: 0 0 2px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.app-toast__message {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.app-toast__close {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 4px;
+}
+
+.app-toast__close:hover {
+  color: var(--ink);
+}
+
+.app-toast--success {
+  border-color: rgba(22, 135, 95, 0.2);
+}
+
+.app-toast--success .app-toast__icon {
+  color: var(--success);
+  background: rgba(22, 135, 95, 0.12);
+}
+
+.app-toast--error {
+  border-color: rgba(199, 60, 53, 0.24);
+}
+
+.app-toast--error .app-toast__icon {
+  color: var(--danger);
+  background: rgba(199, 60, 53, 0.12);
+}
+
+.app-toast--warning {
+  border-color: rgba(244, 181, 68, 0.26);
+}
+
+.app-toast--warning .app-toast__icon {
+  color: #c98a16;
+  background: rgba(244, 181, 68, 0.14);
+}
+
+.app-toast--info {
+  border-color: rgba(50, 183, 167, 0.22);
+}
+
+.app-toast--info .app-toast__icon {
+  color: var(--teal);
+  background: rgba(50, 183, 167, 0.12);
+}
+
+
+/* ── 16. Layout Utilities ─────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.section        { padding: var(--space-3xl) 0; }
+.section-header { text-align: center; margin-bottom: var(--space-2xl); }
+.section-title  { margin-bottom: var(--space-md); }
+
+.section-subtitle {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--muted);
+}
+
+
+/* ── 17. Reduced Motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 var(--space-md); }
+  .section   { padding: var(--space-2xl) 0; }
+  .app-notifications {
+    top: 14px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}
+
+/* ==================================================================
+   Prevent auth UI flash
+   Hide auth-dependent navbar bits until initial auth state is set
+   (Inline script in each page sets `data-auth-initialized` early.)
+   ================================================================== */
+body:not([data-auth-initialized]) #nav-login,
+body:not([data-auth-initialized]) #nav-register,
+body:not([data-auth-initialized]) #nav-user {
+  visibility: hidden !important;
+  opacity: 0;
+}
+
+/* When initial state determined: show appropriate controls */
+/* body[data-auth-initialized="guest"] #nav-login,
+body[data-auth-initialized="guest"] #nav-register {
+  visibility: visible !important;
+  opacity: 1;
+}
+
+body[data-auth-initialized="user"] #nav-user {
+  visibility: visible !important;
+  opacity: 1;
+} */
+
+/* small transition to avoid abrupt appearance */
+/* body [id^="nav-"] { transition: opacity 120ms linear; } */
+
+/* ! if you need in future to tweak with your style bcz the flash showing little bit of register and login so you can ask to ai about it this doenst fix it but ask claude it can be solved this bug this script that i wrote it didnt solved it so i commneted it in both js and home.html file

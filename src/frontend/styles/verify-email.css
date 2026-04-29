@@ -1,0 +1,743 @@
+/* ================================================================
+   VERIFY-EMAIL.CSS — ZohoCine Email Verification Page
+   Depends on: structure.css  (always link structure.css first)
+   ================================================================ */
+
+
+/* ── Page Background ─────────────────────────────────────────── */
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 14% 22%, rgba(50, 183, 167, 0.18), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(244, 181, 68, 0.14), transparent 24%),
+        linear-gradient(135deg, #17171d 0%, #29262b 44%, #f0dcc5 44%, #fbf4eb 100%);
+}
+
+html.dark body {
+    background:
+        radial-gradient(circle at 14% 22%, rgba(50, 183, 167, 0.08), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(244, 181, 68, 0.06), transparent 24%),
+        linear-gradient(135deg, #07070b 0%, #0d0b12 44%, #0c1422 44%, #0a1120 100%);
+}
+
+
+/* ── Shell — two-column layout ───────────────────────────────── */
+.verify-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.75fr);
+    align-items: stretch;
+    gap: clamp(28px, 5vw, 72px);
+    padding: clamp(20px, 4vw, 56px);
+    overflow: hidden;
+}
+
+
+/* ── Showcase — left dark side ───────────────────────────────── */
+.showcase {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 620px;
+    color: #fff8ed;
+}
+
+/* Decorative orbit rings */
+.showcase::before,
+.showcase::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+    border: 1px solid rgba(255, 248, 237, 0.13);
+}
+
+.showcase::before {
+    width:  min(42vw, 540px);
+    height: min(42vw, 540px);
+    left: -8%;
+    top: 14%;
+    animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.showcase::after {
+    width:  min(22vw, 300px);
+    height: min(22vw, 300px);
+    right: 10%;
+    bottom: 12%;
+    border-color: rgba(50, 183, 167, 0.25);
+    animation: glow-pulse 6s ease-in-out infinite reverse;
+}
+
+/* Content above decorations */
+.showcase__content {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+}
+
+.showcase__content h1 {
+    margin: 0;
+    font-size: clamp(3.8rem, 11vw, 8.4rem);
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+}
+
+.showcase__eyebrow {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+}
+
+.showcase__copy {
+    max-width: 420px;
+    margin: 28px 0 0;
+    color: rgba(255, 248, 237, 0.78);
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 1.7;
+}
+
+
+/* ── Decorative Layer ─────────────────────────────────────────── */
+.showcase__deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+/* ── Envelope SVG ────────────────────────────────────────────── */
+.deco-envelope {
+    position: absolute;
+    width: min(38vw, 340px);
+    aspect-ratio: 1;
+    right: clamp(0px, 2vw, 44px);
+    bottom: clamp(24px, 6vw, 96px);
+    opacity: 0.92;
+    animation: float 7s ease-in-out infinite;
+}
+
+.envelope-float {
+    animation: envelope-bob 4s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.check-group {
+    opacity: 0;
+    animation: check-appear 0.6s ease-out 1.5s forwards;
+}
+
+.check-path {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: draw-check 0.5s ease-out 1.8s forwards;
+}
+
+
+/* ── Sparkle Stars SVG ────────────────────────────────────────── */
+.deco-stars {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.sparkle {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.sparkle--1 { animation: twinkle 2.8s ease-in-out infinite; }
+.sparkle--2 { animation: twinkle 3.5s ease-in-out infinite 0.7s; }
+.sparkle--3 { animation: twinkle 4.4s ease-in-out infinite 1.3s; }
+.sparkle--4 { animation: twinkle 2.2s ease-in-out infinite 0.4s; }
+.sparkle--5 { animation: twinkle 3.9s ease-in-out infinite 1.9s; }
+
+
+/* ── Floating Particles ───────────────────────────────────────── */
+.particles {
+    position: absolute;
+    inset: 0;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    animation: particle-float 12s ease-in-out infinite;
+}
+
+.particle--1 {
+    width: 8px;
+    height: 8px;
+    background: var(--teal);
+    left: 15%;
+    top: 30%;
+    animation-delay: 0s;
+}
+
+.particle--2 {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    right: 25%;
+    top: 20%;
+    animation-delay: 2s;
+}
+
+.particle--3 {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 248, 237, 0.6);
+    left: 40%;
+    bottom: 25%;
+    animation-delay: 4s;
+}
+
+.particle--4 {
+    width: 5px;
+    height: 5px;
+    background: var(--teal);
+    right: 15%;
+    bottom: 40%;
+    animation-delay: 6s;
+}
+
+.particle--5 {
+    width: 7px;
+    height: 7px;
+    background: var(--gold);
+    left: 25%;
+    top: 60%;
+    animation-delay: 8s;
+}
+
+
+/* ── Verify Panel — right glass card ──────────────────────────── */
+.verify-panel {
+    position: relative;
+    align-self: center;
+    width: min(100%, 520px);
+    margin-left: auto;
+    padding: clamp(32px, 5vw, 56px);
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    border-radius: var(--radius-md);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+html.dark .verify-panel {
+    border-color: rgba(255, 255, 255, 0.07);
+    box-shadow:
+        var(--shadow),
+        0 0 0 1px rgba(50, 183, 167, 0.08),
+        inset 0 0 40px rgba(50, 183, 167, 0.025);
+}
+
+
+/* ── Dark-Mode Toggle ─────────────────────────────────────────── */
+.verify-panel .dark-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+
+/* ── Verification States ──────────────────────────────────────── */
+.verify-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+
+/* ── State Icons ──────────────────────────────────────────────── */
+.state-icon {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 8px;
+}
+
+.state-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* ── Loading Spinner ──────────────────────────────────────────── */
+.spinner-ring {
+    animation: rotate-slow 2s linear infinite;
+}
+
+.spinner-arc {
+    stroke-dasharray: 180;
+    stroke-dashoffset: 60;
+    animation: spinner-dash 1.5s ease-in-out infinite;
+    transform-origin: center;
+}
+
+
+/* ── Success Animation ────────────────────────────────────────── */
+.verify-state--success .state-icon--success {
+    animation: success-bounce 0.6s ease forwards;
+}
+
+.success-circle {
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283;
+    animation: draw-circle 0.6s ease forwards;
+}
+
+.success-path {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    animation: draw-check 0.4s ease 0.4s forwards;
+}
+
+
+/* ── Error Animation ──────────────────────────────────────────── */
+.error-circle {
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283;
+    animation: draw-circle 0.6s ease forwards;
+}
+
+.error-line {
+    stroke-dasharray: 45;
+    stroke-dashoffset: 45;
+}
+
+.error-line--1 {
+    animation: draw-line 0.3s ease 0.4s forwards;
+}
+
+.error-line--2 {
+    animation: draw-line 0.3s ease 0.5s forwards;
+}
+
+
+/* ── Warning Icon ─────────────────────────────────────────────── */
+.warning-icon circle {
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283;
+    animation: draw-circle 0.6s ease forwards;
+}
+
+.warning-icon line {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: draw-line 0.4s ease 0.4s forwards;
+}
+
+
+/* ── Confetti Particles ───────────────────────────────────────── */
+.confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    opacity: 0;
+}
+
+.confetti--1 {
+    background: var(--teal);
+    top: 10%;
+    left: 20%;
+    animation: confetti-burst 0.8s ease 0.5s forwards;
+}
+
+.confetti--2 {
+    background: var(--gold);
+    top: 5%;
+    right: 25%;
+    animation: confetti-burst 0.8s ease 0.6s forwards;
+    --tx: 30px;
+    --ty: -40px;
+}
+
+.confetti--3 {
+    background: var(--accent);
+    top: 20%;
+    left: 5%;
+    animation: confetti-burst 0.8s ease 0.55s forwards;
+    --tx: -35px;
+    --ty: -25px;
+}
+
+.confetti--4 {
+    background: var(--teal);
+    top: 15%;
+    right: 10%;
+    animation: confetti-burst 0.8s ease 0.65s forwards;
+    --tx: 40px;
+    --ty: -20px;
+}
+
+.confetti--5 {
+    background: var(--gold);
+    bottom: 70%;
+    left: 30%;
+    animation: confetti-burst 0.8s ease 0.7s forwards;
+    --tx: -20px;
+    --ty: -45px;
+}
+
+.confetti--6 {
+    background: rgba(255, 248, 237, 0.8);
+    bottom: 65%;
+    right: 30%;
+    animation: confetti-burst 0.8s ease 0.75s forwards;
+    --tx: 25px;
+    --ty: -35px;
+}
+
+
+/* ── State Text Styles ────────────────────────────────────────── */
+.state-eyebrow {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+}
+
+.state-eyebrow--success { color: var(--teal); }
+.state-eyebrow--error   { color: var(--danger); }
+.state-eyebrow--warning { color: var(--gold); }
+
+.state-title {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+
+.state-text {
+    margin: 0;
+    max-width: 340px;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--muted);
+}
+
+
+/* ── Progress Dots (Loading) ──────────────────────────────────── */
+.progress-dots {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.3;
+    animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+.dot--1 { animation-delay: 0s; }
+.dot--2 { animation-delay: 0.2s; }
+.dot--3 { animation-delay: 0.4s; }
+
+
+/* ── Redirect Info ────────────────────────────────────────────── */
+.redirect-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    margin: 8px 0;
+    background: rgba(50, 183, 167, 0.08);
+    border: 1px solid rgba(50, 183, 167, 0.20);
+    border-radius: var(--radius-sm);
+    color: var(--teal);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.redirect-info p {
+    margin: 0;
+    color: var(--teal);
+}
+
+.redirect-icon {
+    display: flex;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.redirect-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+#countdown {
+    font-weight: 800;
+    font-size: 1.1em;
+}
+
+
+/* ── Error Actions ────────────────────────────────────────────── */
+.error-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.error-actions .primary-button {
+    width: 100%;
+    max-width: 280px;
+}
+
+.secondary-link {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 200ms ease;
+}
+
+.secondary-link:hover {
+    color: var(--ink);
+    text-decoration: underline;
+}
+
+
+/* ── Success State Button ─────────────────────────────────────── */
+.verify-state--success .primary-button {
+    margin-top: 8px;
+    max-width: 260px;
+}
+
+
+/* ── Keyframes ────────────────────────────────────────────────── */
+
+@keyframes envelope-bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes check-appear {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes draw-check {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes draw-circle {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes draw-line {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes rotate-slow {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes spinner-dash {
+    0%   { stroke-dashoffset: 180; transform: rotate(0deg); }
+    50%  { stroke-dashoffset: 45;  transform: rotate(180deg); }
+    100% { stroke-dashoffset: 180; transform: rotate(360deg); }
+}
+
+@keyframes success-bounce {
+    0%   { transform: scale(0.3); opacity: 0; }
+    50%  { transform: scale(1.1); }
+    70%  { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes dot-pulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
+    40%           { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes particle-float {
+    0%, 100% { 
+        opacity: 0; 
+        transform: translateY(0) scale(0);
+    }
+    10% { 
+        opacity: 0.7; 
+        transform: translateY(-20px) scale(1);
+    }
+    50% { 
+        opacity: 0.4; 
+        transform: translateY(-80px) scale(0.8);
+    }
+    90% { 
+        opacity: 0; 
+        transform: translateY(-140px) scale(0.3);
+    }
+}
+
+@keyframes confetti-burst {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(var(--tx, -25px), var(--ty, -30px)) scale(1.2) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(var(--tx, -25px) * 1.5), calc(var(--ty, -30px) + 20px)) scale(0.5) rotate(360deg);
+    }
+}
+
+@keyframes glow-pulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+}
+
+@keyframes twinkle {
+    0%,  100% { opacity: 1;    transform: scale(1);    }
+    40%       { opacity: 0.15; transform: scale(0.45); }
+    70%       { opacity: 0.85; transform: scale(1.12); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) translateZ(0); }
+    50%      { transform: translateY(-14px) translateZ(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 920px) {
+    body {
+        background:
+            radial-gradient(circle at 20% 10%, rgba(50, 183, 167, 0.16), transparent 28%),
+            linear-gradient(160deg, #17171d 0%, #29262b 38%, #f7ead7 38%, #fbf4eb 100%);
+    }
+
+    html.dark body {
+        background:
+            radial-gradient(circle at 20% 10%, rgba(50, 183, 167, 0.06), transparent 28%),
+            linear-gradient(160deg, #07070b 0%, #0d0b12 38%, #0c1422 38%, #0a1120 100%);
+    }
+
+    .verify-shell {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .showcase {
+        min-height: 300px;
+        align-items: flex-end;
+    }
+
+    .deco-envelope {
+        width: min(46vw, 250px);
+        right: 6px;
+        top: 36px;
+        bottom: auto;
+    }
+
+    .verify-panel {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .verify-shell {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .showcase {
+        min-height: 240px;
+    }
+
+    .showcase__content h1 {
+        font-size: clamp(2.8rem, 16vw, 4rem);
+    }
+
+    .showcase__copy {
+        font-size: 0.9rem;
+        max-width: 290px;
+        margin-top: 16px;
+    }
+
+    .deco-envelope {
+        opacity: 0.42;
+        width: 180px;
+    }
+
+    .verify-panel {
+        padding: 24px;
+    }
+
+    .state-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .state-title {
+        font-size: 1.6rem;
+    }
+
+    .redirect-info {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px 16px;
+    }
+}
+
+
+/* ── Dark Mode Overrides ──────────────────────────────────────── */
+html.dark .showcase {
+    color: #fffaf0;
+}
+
+html.dark .showcase__eyebrow {
+    color: var(--teal);
+}
+
+html.dark .showcase__copy {
+    color: rgba(255, 248, 237, 0.78);
+}
+
+html.dark .showcase::before {
+    border-color: rgba(255, 248, 237, 0.08);
+}
+
+html.dark .showcase::after {
+    border-color: rgba(50, 183, 167, 0.15);
+}
+
+html.dark .redirect-info {
+    background: rgba(50, 183, 167, 0.12);
+    border-color: rgba(50, 183, 167, 0.25);
+}

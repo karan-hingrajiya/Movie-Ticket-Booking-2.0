@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZohoCine | Home</title>
+  <meta name="description" content="Book tickets, explore movies, and feel every story like you're inside it.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/structure.css">
+  <link rel="stylesheet" href="/styles/home.css">
+</head>
+<body>
+  <script>
+    // Prevent auth UI flash: set an initial auth state synchronously
+    // (function () {
+    //   try {
+    //     var token = localStorage.getItem("accessToken");
+    //     document.body.setAttribute("data-auth-initialized", token ? "user" : "guest");
+    //   } catch (e) {
+    //     document.body.setAttribute("data-auth-initialized", "guest");
+    //   }
+    // })();
+  </script>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">ZohoCine</div>
+
+    <div class="nav-right">
+      <nav class="nav-links">
+        <a href="/home.html" class="nav-link">Home</a>
+        <a href="#movies" class="nav-link">Movies</a>
+        <a href="#" class="nav-link">TV Shows</a>
+        <a id="nav-login" href="/login.html" class="btn btn-ghost">Login</a>
+        <a id="nav-register" href="/register.html" class="btn btn-primary">Register</a>
+      </nav>
+
+      <div id="nav-user" class="nav-user" aria-live="polite"></div>
+
+      <button class="dark-toggle" aria-label="Toggle theme">
+        <!-- Moon -->
+        <svg class="icon-moon" viewBox="0 0 24 24">
+          <path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" />
+        </svg>
+
+        <!-- Sun -->
+        <svg class="icon-sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="home-hero">
+    <div class="hero-content">
+      <div class="badge">New Releases Every Week</div>
+      
+      <h1>
+        Experience<br>
+        <span class="hero-highlight">Cinema</span>
+      </h1>
+
+      <p class="hero-subtext">
+        Book tickets, explore movies, and feel every story like you're inside it. 
+        Start your cinematic journey with ZohoCine today.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#movies" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Explore Movies
+        </a>
+        <button class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+          </svg>
+          Watch Trailer
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value" data-count="10000" data-suffix="+">0</div>
+          <div class="stat-label">Movies & Shows</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-count="50" data-suffix="M+">0</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-count="4" data-suffix="K">0</div>
+          <div class="stat-label">HD Quality</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <!-- Film Glow Rings -->
+      <div class="hero-rings"></div>
+
+      <!-- Floating Film Disc -->
+      <svg class="hero-reel" viewBox="0 0 300 300">
+        <circle cx="150" cy="150" r="120" stroke="rgba(244,181,68,0.25)" stroke-width="1.5" fill="none" />
+        <circle cx="150" cy="150" r="80" stroke="rgba(244,181,68,0.15)" stroke-width="1" fill="none" />
+        <circle cx="150" cy="150" r="40" stroke="rgba(244,181,68,0.1)" stroke-width="0.5" fill="none" />
+        <!-- Reel dots -->
+        <circle cx="150" cy="50" r="8" fill="rgba(244,181,68,0.3)" />
+        <circle cx="150" cy="250" r="8" fill="rgba(244,181,68,0.3)" />
+        <circle cx="50" cy="150" r="8" fill="rgba(244,181,68,0.3)" />
+        <circle cx="250" cy="150" r="8" fill="rgba(244,181,68,0.3)" />
+      </svg>
+
+      <!-- Glass Featured Card (featured poster) -->
+      <div class="hero-card">
+        <img src="/images/darkknight-poster.jpeg" alt="The Dark Knight" class="hero-featured-poster">
+        <div class="hero-card-caption">
+          <div class="hero-card-title">The Dark Knight</div>
+          <div class="hero-card-sub">Now Streaming</div>
+        </div>
+      </div>
+
+      <!-- Ambient Lights -->
+      <div class="hero-glow gold"></div>
+      <div class="hero-glow teal"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features section">
+    <div class="container">
+      <div class="section-header scroll-animate">
+        <h2 class="section-title">Why Choose ZohoCine?</h2>
+        <p class="section-subtitle">Experience entertainment like never before with our premium features</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="glass-card feature-card scroll-animate">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+          <h3 class="feature-title">4K Streaming</h3>
+          <p class="feature-description">Watch your favorite content in stunning 4K Ultra HD quality with HDR support.</p>
+        </div>
+        
+        <div class="glass-card feature-card scroll-animate">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title">Download & Watch</h3>
+          <p class="feature-description">Download movies and shows to watch offline anytime, anywhere.</p>
+        </div>
+        
+        <div class="glass-card feature-card scroll-animate">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Family Profiles</h3>
+          <p class="feature-description">Create up to 5 profiles with personalized recommendations for everyone.</p>
+        </div>
+        
+        <div class="glass-card feature-card scroll-animate">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title">Multi-Device</h3>
+          <p class="feature-description">Stream on any device - TV, laptop, tablet, or phone seamlessly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOVIES -->
+  <section id="movies" class="movies">
+    <div class="container">
+      <div class="section-header scroll-animate">
+        <h2 class="section-title">Now Showing</h2>
+        <p class="section-subtitle">Discover what everyone is watching this week</p>
+      </div>
+
+      <div class="movie-grid">
+        <div class="movie-card scroll-animate" data-movie-id="1">
+          <img src="/images/inception-poster.jpeg" alt="Inception" class="movie-poster">
+          <div class="movie-info">
+            <div class="movie-title">Inception</div>
+            <div class="movie-meta">
+              <span class="rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                8.8
+              </span>
+              <span>Action</span>
+              <span>2h 28m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="movie-card scroll-animate" data-movie-id="2">
+          <img src="/images/darkknight-poster.jpeg" alt="The Dark Knight" class="movie-poster">
+          <div class="movie-info">
+            <div class="movie-title">The Dark Knight</div>
+            <div class="movie-meta">
+              <span class="rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                9.0
+              </span>
+              <span>Drama</span>
+              <span>2h 32m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="movie-card scroll-animate" data-movie-id="3">
+          <img src="/images/intersteller.jpg" alt="Interstellar" class="movie-poster">
+          <div class="movie-info">
+            <div class="movie-title">Interstellar</div>
+            <div class="movie-meta">
+              <span class="rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                8.6
+              </span>
+              <span>Sci-Fi</span>
+              <span>2h 49m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="movie-card scroll-animate" data-movie-id="4">
+          <img src="/images/dune-poster.jpeg" alt="Dune: Part Two" class="movie-poster">
+          <div class="movie-info">
+            <div class="movie-title">Dune: Part Two</div>
+            <div class="movie-meta">
+              <span class="rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                8.8
+              </span>
+              <span>Sci-Fi</span>
+              <span>2h 46m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta section">
+    <div class="container">
+      <div class="section-header scroll-animate">
+        <h2 class="section-title">Ready to Start Watching?</h2>
+        <p class="section-subtitle">Join millions of users and start your free trial today. No credit card required.</p>
+      </div>
+      <div class="hero-actions" style="justify-content: center;">
+        <a href="#" class="btn btn-secondary scroll-animate">Start Free Trial</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="logo">ZohoCine</div>
+        
+        <nav class="footer-links">
+          <a href="#" class="footer-link">About</a>
+          <a href="#" class="footer-link">Privacy</a>
+          <a href="#" class="footer-link">Terms</a>
+          <a href="#" class="footer-link">Contact</a>
+        </nav>
+        
+        <p class="footer-copy">2026 ZohoCine. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/scripts/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+/* ================================================================
+   REGISTER.CSS — ZohoCine Registration Page
+   Depends on: structure.css  (always link structure.css first)
+   ================================================================ */
+
+/* ── Page Background ─────────────────────────────────────────── */
+body {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(244, 181, 68, 0.22),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 86% 18%,
+      rgba(50, 183, 167, 0.18),
+      transparent 24%
+    ),
+    linear-gradient(135deg, #17171d 0%, #29262b 44%, #f0dcc5 44%, #fbf4eb 100%);
+}
+
+html.dark body {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(244, 181, 68, 0.1),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 86% 18%,
+      rgba(50, 183, 167, 0.08),
+      transparent 24%
+    ),
+    linear-gradient(135deg, #07070b 0%, #0d0b12 44%, #0c1422 44%, #0a1120 100%);
+}
+
+/* ── Shell — two-column layout ───────────────────────────────── */
+.register-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.75fr);
+  align-items: stretch;
+  gap: clamp(28px, 5vw, 72px);
+  padding: clamp(20px, 4vw, 56px);
+  overflow: hidden;
+}
+
+/* ── Showcase — left dark side ───────────────────────────────── */
+.showcase {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 620px;
+  color: #fff8ed;
+}
+
+.showcase::before,
+.showcase::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(255, 248, 237, 0.22);
+  border-radius: 999px;
+  transform: rotate(-12deg);
+}
+
+.showcase::before {
+  width: min(42vw, 560px);
+  height: min(42vw, 560px);
+  left: -10%;
+  top: 12%;
+}
+
+.showcase::after {
+  width: min(24vw, 320px);
+  height: min(24vw, 320px);
+  right: 8%;
+  bottom: 10%;
+  border-color: rgba(244, 181, 68, 0.28);
+}
+
+.showcase__content {
+  position: relative;
+  z-index: 2;
+  max-width: 660px;
+}
+
+/* Eyebrow label + panel eyebrow share same type styles */
+.showcase__eyebrow,
+.panel-heading p {
+  margin: 0 0 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.showcase__eyebrow {
+  color: var(--gold);
+}
+
+.showcase h1 {
+  margin: 0;
+  font-size: clamp(4rem, 12vw, 8.8rem);
+  line-height: 0.88;
+  letter-spacing: 0;
+}
+
+.showcase__copy {
+  max-width: 480px;
+  margin: 28px 0 0;
+  color: rgba(255, 248, 237, 0.78);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.7;
+}
+
+/* ── Animated Ticket Stack ────────────────────────────────────── */
+.ticket-stack {
+  position: absolute;
+  right: clamp(0px, 3vw, 54px);
+  bottom: clamp(28px, 7vw, 110px);
+  width: min(34vw, 320px);
+  aspect-ratio: 1.55;
+  z-index: 1;
+  animation: floatTicket 6s ease-in-out infinite;
+}
+
+.ticket {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 28px;
+  border-radius: 8px;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.24);
+}
+
+/* Notch circles on left and right of each ticket */
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #201d23;
+  transform: translateY(-50%);
+}
+
+.ticket::before {
+  left: -16px;
+}
+.ticket::after {
+  right: -16px;
+}
+
+.ticket--front {
+  z-index: 2;
+  color: var(--panel);
+  background: linear-gradient(135deg, var(--gold), #ffe7a6 48%, #fff6df);
+  transform: rotate(-7deg);
+}
+
+.ticket--back {
+  background: linear-gradient(135deg, var(--teal), #9ae5dc);
+  transform: rotate(9deg) translate(24px, 28px);
+}
+
+.ticket__label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ticket strong {
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  line-height: 1;
+}
+
+/* ── Register Panel — right glass card ───────────────────────── */
+.register-panel {
+  position: relative; /* ← anchors the .dark-toggle button */
+  align-self: center;
+  width: min(100%, 480px);
+  margin-left: auto;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+/* Dark mode glass */
+html.dark .register-panel {
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    var(--shadow),
+    0 0 0 1px rgba(244, 181, 68, 0.07),
+    inset 0 0 40px rgba(244, 181, 68, 0.025);
+}
+
+/* ── Dark-Mode Toggle inside the panel ───────────────────────── */
+/*
+  structure.css gives .dark-toggle its visual styles.
+  Here we just position it absolutely in the panel corner.
+*/
+.register-panel .dark-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+/* ── Register Form ────────────────────────────────────────────── */
+.register-form {
+  display: grid;
+  gap: 18px;
+}
+
+/* ── Email-sent confirmation state ───────────────────────────── */
+/* Shown after successful registration — JS replaces form content */
+
+.email-sent-state {
+  display: grid;
+  gap: 14px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--teal);
+  margin: 0 auto;
+}
+
+.confirm-eyebrow {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.confirm-body {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.confirm-note {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* ── Dark Mode Text Overrides ─────────────────────────────────── */
+html.dark .showcase {
+  color: #fffaf0;
+}
+html.dark .showcase__eyebrow {
+  color: var(--gold);
+}
+html.dark .showcase__copy {
+  color: rgba(255, 248, 237, 0.78);
+}
+html.dark .showcase::before {
+  border-color: rgba(255, 248, 237, 0.08);
+}
+html.dark .showcase::after {
+  border-color: rgba(244, 181, 68, 0.12);
+}
+html.dark .panel-heading p {
+  color: var(--gold);
+}
+html.dark .panel-heading h2 {
+  color: var(--ink);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 920px) {
+  body {
+    background:
+      radial-gradient(
+        circle at 20% 10%,
+        rgba(244, 181, 68, 0.22),
+        transparent 28%
+      ),
+      linear-gradient(
+        160deg,
+        #17171d 0%,
+        #29262b 38%,
+        #f7ead7 38%,
+        #fbf4eb 100%
+      );
+  }
+
+  html.dark body {
+    background:
+      radial-gradient(
+        circle at 20% 10%,
+        rgba(244, 181, 68, 0.08),
+        transparent 28%
+      ),
+      linear-gradient(
+        160deg,
+        #07070b 0%,
+        #0d0b12 38%,
+        #0c1422 38%,
+        #0a1120 100%
+      );
+  }
+
+  .register-shell {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .showcase {
+    min-height: 320px;
+    align-items: flex-end;
+  }
+
+  .ticket-stack {
+    width: min(48vw, 260px);
+    right: 6px;
+    top: 42px;
+    bottom: auto;
+  }
+
+  .register-panel {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .register-shell {
+    padding: 16px;
+  }
+  .showcase {
+    min-height: 260px;
+  }
+
+  .showcase h1 {
+    font-size: clamp(3.1rem, 18vw, 4.4rem);
+  }
+
+  .showcase__copy {
+    max-width: 320px;
+    font-size: 0.95rem;
+  }
+
+  .ticket-stack {
+    opacity: 0.42;
+    width: 190px;
+  }
+
+  .register-panel {
+    padding: 22px;
+  }
+}

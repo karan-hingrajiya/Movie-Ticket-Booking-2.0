@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | CinePass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/structure.css">
+    <link rel="stylesheet" href="/styles/register.css">
+</head>
+<body>
+    <main class="register-shell">
+        <section class="showcase" aria-label="Movie ticket booking registration">
+            <div class="showcase__content">
+                <p class="showcase__eyebrow">Book Your Ticket Now</p>
+                <h1>Join Now</h1>
+                <p class="showcase__copy">Create your account and keep every premiere, seat, and booking moment in one clean place.</p>
+            </div>
+
+            <div class="ticket-stack" aria-hidden="true">
+                <div class="ticket ticket--front">
+                    <span class="ticket__label">Tonight</span>
+                    <strong>Screen 07</strong>
+                    <span>Row H / Seat 12</span>
+                </div>
+                <div class="ticket ticket--back"></div>
+            </div>
+        </section>
+
+        <section class="register-panel" aria-label="Create account form">
+            <!-- Dark-mode toggle -->
+            <button id="darkToggle" class="dark-toggle" type="button"
+                    aria-pressed="false" aria-label="Toggle dark mode">
+                <!-- Sun (shown in dark mode) -->
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <line x1="12" y1="2"     x2="12" y2="5"/>
+                    <line x1="12" y1="19"    x2="12" y2="22"/>
+                    <line x1="2"  y1="12"    x2="5"  y2="12"/>
+                    <line x1="19" y1="12"    x2="22" y2="12"/>
+                    <line x1="4.22"  y1="4.22"  x2="6.34"  y2="6.34"/>
+                    <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+                    <line x1="4.22"  y1="19.78" x2="6.34"  y2="17.66"/>
+                    <line x1="17.66" y1="6.34"  x2="19.78" y2="4.22"/>
+                </svg>
+                <!-- Moon (shown in light mode) -->
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+
+            <div class="panel-heading">
+                <p>Start booking With Us</p>
+                <h2>Create account</h2>
+            </div>
+
+            <form id="registerForm" class="register-form" novalidate>
+                <label class="field" for="userName">
+                    <span class="field__label">Full name</span>
+                    <span class="field__control">
+                        <input id="userName" name="name" type="text" autocomplete="name" placeholder="Roronoa Zoro">
+                    </span>
+                    <span id="userNameError" class="field__error" aria-live="polite"></span>
+                </label>
+
+                <label class="field" for="userEmail">
+                    <span class="field__label">Email address</span>
+                    <span class="field__control">
+                        <input id="userEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+                    </span>
+                    <span id="userEmailError" class="field__error" aria-live="polite"></span>
+                </label>
+
+                <label class="field" for="userPassword">
+                    <span class="field__label">Password</span>
+                    <span class="field__control field__control--password">
+                        <input id="userPassword" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+                        <button id="togglePassword" class="icon-button" type="button" aria-label="Show password">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 5c5.2 0 8.5 4.4 9.5 6.1.3.6.3 1.2 0 1.8C20.5 14.6 17.2 19 12 19s-8.5-4.4-9.5-6.1a1.8 1.8 0 0 1 0-1.8C3.5 9.4 6.8 5 12 5Zm0 2C7.8 7 5 10.6 4.3 12c.7 1.4 3.5 5 7.7 5s7-3.6 7.7-5C19 10.6 16.2 7 12 7Zm0 2.2A2.8 2.8 0 1 1 12 14.8a2.8 2.8 0 0 1 0-5.6Zm0 2A.8.8 0 1 0 12 12.8a.8.8 0 0 0 0-1.6Z"/>
+                            </svg>
+                        </button>
+                    </span>
+                    <span class="strength-meter" aria-hidden="true">
+                        <span id="passwordStrengthBar" class="strength-meter__bar"></span>
+                    </span>
+                    <span id="passwordStrengthText" class="strength-meter__text">Start typing</span>
+                    <span id="userPasswordError" class="field__error" aria-live="polite"></span>
+                </label>
+
+                <button id="registerBtn" class="primary-button" type="submit">
+                    <span class="button__text">Create account</span>
+                    <span class="button__loader" aria-hidden="true"></span>
+                </button>
+
+                <p id="formStatus" class="form-status" aria-live="polite"></p>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        window.AUTH_API_BASE_URL = location.origin + '/api/auth';
+    </script>
+    <script type="module" src="/scripts/register-user.js"></script>
+</body>
+</html>

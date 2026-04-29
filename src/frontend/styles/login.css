@@ -1,0 +1,385 @@
+/* ================================================================
+   LOGIN.CSS — ZohoCine Sign-In Page
+   Depends on: structure.css  (always link structure.css first)
+   ================================================================ */
+
+
+/* ── Page Background ─────────────────────────────────────────── */
+
+/* Light mode: same diagonal split as register — dark cinema left, warm right */
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 14% 22%, rgba(244, 181, 68, 0.20), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(50, 183, 167, 0.16), transparent 24%),
+        linear-gradient(135deg, #17171d 0%, #29262b 44%, #f0dcc5 44%, #fbf4eb 100%);
+}
+
+/* Dark mode: keeps the diagonal but goes full deep-dark on both sides */
+html.dark body {
+    background:
+        radial-gradient(circle at 14% 22%, rgba(244, 181, 68, 0.07), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(50, 183, 167, 0.07), transparent 24%),
+        linear-gradient(135deg, #07070b 0%, #0d0b12 44%, #0c1422 44%, #0a1120 100%);
+}
+
+
+/* ── Shell — two-column layout ───────────────────────────────── */
+.login-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.75fr);
+    align-items: stretch;
+    gap: clamp(28px, 5vw, 72px);
+    padding: clamp(20px, 4vw, 56px);
+    overflow: hidden;
+}
+
+
+/* ── Showcase — left dark side ───────────────────────────────── */
+.showcase {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 620px;
+    color: #fff8ed;
+}
+
+/* Decorative orbit rings (pure CSS, no extra markup) */
+.showcase::before,
+.showcase::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+    border: 1px solid rgba(255, 248, 237, 0.13);
+}
+
+.showcase::before {
+    width:  min(42vw, 540px);
+    height: min(42vw, 540px);
+    left: -8%;
+    top: 14%;
+    animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.showcase::after {
+    width:  min(22vw, 300px);
+    height: min(22vw, 300px);
+    right: 10%;
+    bottom: 12%;
+    border-color: rgba(244, 181, 68, 0.20);
+    animation: glow-pulse 6s ease-in-out infinite reverse;
+}
+
+/* Content sits above all decorations */
+.showcase__content {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+}
+
+.showcase__content h1 {
+    margin: 0;
+    font-size: clamp(3.8rem, 11vw, 8.4rem);
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+}
+
+
+/* ── Decorative Layer ─────────────────────────────────────────── */
+
+/* Absolute full-area container for all SVG / CSS deco */
+.showcase__deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+/* ── Film Reel SVG ────────────────────────────────────────────── */
+.deco-reel {
+    position: absolute;
+    width: min(38vw, 340px);
+    aspect-ratio: 1;
+    right: clamp(0px, 2vw, 44px);
+    bottom: clamp(24px, 6vw, 96px);
+    opacity: 0.88;
+    animation: float 7s ease-in-out infinite;
+}
+
+/* The inner <g> that rotates */
+.reel-rotate {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: reel-turn 20s linear infinite;
+}
+
+
+/* ── Sparkle Stars SVG ────────────────────────────────────────── */
+.deco-stars {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Each sparkle group uses transform-box for clean rotation origin */
+.sparkle {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* Staggered twinkle timings */
+.sparkle--1 { animation: twinkle 2.8s ease-in-out infinite; }
+.sparkle--2 { animation: twinkle 3.5s ease-in-out infinite 0.7s; }
+.sparkle--3 { animation: twinkle 4.4s ease-in-out infinite 1.3s; }
+.sparkle--4 { animation: twinkle 2.2s ease-in-out infinite 0.4s; }
+.sparkle--5 { animation: twinkle 3.9s ease-in-out infinite 1.9s; }
+.sparkle--6 { animation: twinkle 3.0s ease-in-out infinite 0.9s; }
+
+
+/* ── Film Strip ───────────────────────────────────────────────── */
+.film-strip {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    overflow: hidden;
+    opacity: 0.18;
+    /* gradient fade at top & bottom so it doesn't hard-clip */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,1) 8%,
+        rgba(0,0,0,1) 92%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,1) 8%,
+        rgba(0,0,0,1) 92%,
+        transparent 100%
+    );
+}
+
+/* The scrolling inner list */
+.film-strip__track {
+    display: flex;
+    flex-direction: column;
+    animation: film-scroll 9s linear infinite;
+}
+
+/* One film frame cell */
+.film-frame {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255, 248, 237, 0.55);
+    margin: 4px 0;
+    border-radius: 2px;
+    position: relative;
+}
+
+/* Sprocket holes punched into each frame — left & right */
+.film-frame::before,
+.film-frame::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 248, 237, 0.45);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.film-frame::before { left:  4px; }
+.film-frame::after  { right: 4px; }
+
+
+/* ── Login Panel — right glass card ──────────────────────────── */
+.login-panel {
+    position: relative;
+    align-self: center;
+    width: min(100%, 480px);
+    margin-left: auto;
+    padding: clamp(26px, 4.5vw, 46px);
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    border-radius: var(--radius-md);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+/* Dark mode glass shifts to deep-navy frost */
+html.dark .login-panel {
+    border-color: rgba(255, 255, 255, 0.07);
+    /* warm gold edge-glow in dark mode */
+    box-shadow:
+        var(--shadow),
+        0 0 0 1px rgba(244, 181, 68, 0.07),
+        inset 0 0 40px rgba(244, 181, 68, 0.025);
+}
+
+
+/* ── Dark-Mode Toggle ─────────────────────────────────────────── */
+.dark-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition:
+        color        150ms,
+        background   150ms,
+        border-color 150ms,
+        transform    200ms var(--ease-bounce);
+}
+
+.dark-toggle:hover {
+    color: var(--ink);
+    background: rgba(16, 16, 20, 0.06);
+    transform: rotate(18deg);
+}
+
+html.dark .dark-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* SVG styling for sun / moon icons */
+.dark-toggle svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Light mode → show moon, hide sun */
+.dark-toggle .icon-sun  { display: none; }
+.dark-toggle .icon-moon { display: block; }
+
+/* Dark mode → show sun, hide moon */
+html.dark .dark-toggle .icon-sun  { display: block; }
+html.dark .dark-toggle .icon-moon { display: none; }
+
+
+/* ── Login Form ───────────────────────────────────────────────── */
+.login-form {
+    display: grid;
+    gap: 18px;
+}
+
+.forgot-row {
+    margin: -8px 0 0;
+    text-align: right;
+}
+
+
+/* ── Register CTA at the bottom ──────────────────────────────── */
+.form-footer {
+    margin: 4px 0 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+.form-link {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 150ms, letter-spacing 150ms;
+}
+
+.form-link:hover {
+    color: var(--accent-dark);
+    text-decoration: underline;
+    letter-spacing: 0.01em;
+}
+
+
+/* ── Responsive: tablet / mobile ─────────────────────────────── */
+@media (max-width: 920px) {
+    body {
+        background:
+            radial-gradient(circle at 20% 10%, rgba(244, 181, 68, 0.18), transparent 28%),
+            linear-gradient(160deg, #17171d 0%, #29262b 38%, #f7ead7 38%, #fbf4eb 100%);
+    }
+
+    html.dark body {
+        background:
+            radial-gradient(circle at 20% 10%, rgba(244, 181, 68, 0.06), transparent 28%),
+            linear-gradient(160deg, #07070b 0%, #0d0b12 38%, #0c1422 38%, #0a1120 100%);
+    }
+
+    .login-shell {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .showcase {
+        min-height: 300px;
+        align-items: flex-end;
+    }
+
+    .deco-reel {
+        width: min(46vw, 250px);
+        right: 6px;
+        top: 36px;
+        bottom: auto;
+    }
+
+    .login-panel {
+        width: 100%;
+        margin: 0;
+    }
+
+    .film-strip {
+        display: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .login-shell {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .showcase {
+        min-height: 240px;
+    }
+
+    .showcase__content h1 {
+        font-size: clamp(2.8rem, 16vw, 4rem);
+    }
+
+    .showcase__copy {
+        font-size: 0.9rem;
+        max-width: 290px;
+        margin-top: 16px;
+    }
+
+    .deco-reel {
+        opacity: 0.42;
+        width: 180px;
+    }
+
+    .login-panel {
+        padding: 22px;
+    }
+}
