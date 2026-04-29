@@ -15,6 +15,7 @@ const allowedOrigins = new Set(
     process.env.APP_URL,
     process.env.CLIENT_URL,
     process.env.FRONTEND_URL,
+    process.env.RENDER_EXTERNAL_URL,
     "http://localhost:3000",
     "http://localhost:5000",
     "http://127.0.0.1:3000",
@@ -34,12 +35,29 @@ app.use(cookieParser());
 app.use(
   cors({
     origin(origin, callback) {
+      const normalizedOrigin = normalizeOrigin(origin);
+      const isRenderOrigin = (() => {
+        try {
+          return (
+            !!normalizedOrigin &&
+            new URL(normalizedOrigin).hostname.endsWith(".onrender.com")
+          );
+        } catch {
+          return false;
+        }
+      })();
+
       // Allow same-origin/server requests (no Origin header),
       // and explicitly allow configured browser origins.
-      if (!origin || allowedOrigins.has(normalizeOrigin(origin))) {
+      if (
+        !origin ||
+        allowedOrigins.has(normalizedOrigin) ||
+        isRenderOrigin
+      ) {
         return callback(null, true);
       }
-      return callback(new Error("CORS origin not allowed"));
+      // Do not throw 500 on CORS mismatch.
+      return callback(null, false);
     },
     credentials: true,
   }),
