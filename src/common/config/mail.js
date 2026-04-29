@@ -1,10 +1,15 @@
 import nodemailer from "nodemailer";
+import dns from "node:dns";
 import ApiError from "../utils/api-error.js";
 
 let transporter;
 const nodeEnv = process.env.NODE_ENV || process.env.NODE_env || "development";
 
 const appName = process.env.APP_NAME || "ZohoCine";
+
+// Render instances can hit IPv6 SMTP reachability issues.
+// Prefer IPv4 lookups to avoid ENETUNREACH on smtp.gmail.com.
+dns.setDefaultResultOrder("ipv4first");
 
 const getAppUrl = () => {
     return process.env.APP_URL || `http://localhost:${process.env.PORT || 5000}`;
