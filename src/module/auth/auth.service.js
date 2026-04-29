@@ -28,6 +28,9 @@ const comparePassword = async (userPasswordPlain, userPasswordHashed) => {
 };
 //create document and add user into DB its registering the user code
 export const registerUser = async (payload) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H5',location:'auth.service.js:registerUser:start',message:'Register flow started',data:{hasName:Boolean(payload?.name),emailDomain:String(payload?.email||'').split('@')[1]||'unknown',hasPassword:Boolean(payload?.password)},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   const User = getCollection("users");
 
   const normalizedEmail = payload.email.trim().toLowerCase();
@@ -56,6 +59,9 @@ export const registerUser = async (payload) => {
   } catch (err) {
     await User.deleteOne({ _id: result.insertedId });
     console.error("Failed to send verification email:", err.message);
+    // #region agent log
+    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H5',location:'auth.service.js:registerUser:catch',message:'Register failed due to email send',data:{errorMessage:err?.message||'unknown'},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     throw ApiError.badRequest("failed to send verification email");
   }
 

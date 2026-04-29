@@ -149,6 +149,10 @@ const getTransporter = () => {
 
     if(transporter) return transporter;
 
+    // #region agent log
+    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H1',location:'mail.js:getTransporter',message:'Choosing transporter branch',data:{nodeEnv,hasMailtrapUser:Boolean(process.env.MAILTRAP_USER),hasGmailUser:Boolean(process.env.GMAIL_USER),gmailHost:process.env.GMAIL_HOST||null,gmailPort:process.env.GMAIL_PORT||null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+
     if (nodeEnv === "development") {
     transporter = nodemailer.createTransport({
         host: process.env.MAILTRAP_HOST,
@@ -192,15 +196,34 @@ const sendEmail = async ({to,subject,html,text}) => {
       nodeEnv === "development"
         ? process.env.MAIL_FROM || process.env.MAILTRAP_USER || process.env.GMAIL_USER
         : process.env.GMAIL_USER || process.env.MAIL_FROM || process.env.MAILTRAP_USER;
-    const info = await getTransporter().sendMail({
-        from : `"${appName}" <${from}>`,
-        to,
-        subject,
-        html,
-        text,
-    });
+    const toDomain = String(to || "").split("@")[1] || "unknown";
+    const fromDomain = String(from || "").split("@")[1] || "unknown";
+    const transportPort = Number(process.env.GMAIL_PORT || process.env.MAILTRAP_PORT || 0);
+
+    // #region agent log
+    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H3',location:'mail.js:sendEmail',message:'About to send email',data:{nodeEnv,fromDomain,toDomain,subjectType:subject?.includes('Verify')?'verify':'other',secure:transportPort===465,port:transportPort},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+
+    let info;
+    try {
+      info = await getTransporter().sendMail({
+          from : `"${appName}" <${from}>`,
+          to,
+          subject,
+          html,
+          text,
+      });
+    } catch (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:catch',message:'SMTP send failed',data:{errorCode:error?.code||null,errorResponseCode:error?.responseCode||null,errorCommand:error?.command||null,errorMessage:error?.message||'unknown'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      throw error;
+    }
 
     console.log(`Email has been sent to ${info.messageId}`);
+    // #region agent log
+    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H4',location:'mail.js:sendEmail:success',message:'SMTP send succeeded',data:{messageId:info?.messageId||null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
 }
 
 const verificationEmail = async (userMail, token) => {
