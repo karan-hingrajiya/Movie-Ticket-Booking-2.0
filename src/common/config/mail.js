@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
 import dns from "node:dns";
 import ApiError from "../utils/api-error.js";
+import { promisify } from "node:util";
 
 let transporter;
 const nodeEnv = process.env.NODE_ENV || process.env.NODE_env || "development";
 
 const appName = process.env.APP_NAME || "ZohoCine";
+const resolve4 = promisify(dns.resolve4);
 
 // Render instances can hit IPv6 SMTP reachability issues.
 // Prefer IPv4 lookups to avoid ENETUNREACH on smtp.gmail.com.
@@ -150,6 +152,32 @@ If you did not request a password reset, you can ignore this email.
     };
 };
 
+const createSmtpTransport = ({ host, port, forceIpv4 = false }) => {
+  const secure = Number(port) === 465;
+  const baseConfig = {
+    host,
+    port: Number(port),
+    secure, // STARTTLS on 587, SSL/TLS on 465
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASSWORD,
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
+  };
+
+  if (!forceIpv4) {
+    return nodemailer.createTransport(baseConfig);
+  }
+
+  return nodemailer.createTransport({
+    ...baseConfig,
+    // Keep TLS host validation against Gmail host while connecting to IPv4 address.
+    tls: { servername: process.env.GMAIL_HOST || "smtp.gmail.com" },
+  });
+};
+
 const getTransporter = () => {
 
     if(transporter) return transporter;
@@ -170,18 +198,7 @@ const getTransporter = () => {
     } else {
     const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
     const gmailPort = Number(process.env.GMAIL_PORT || 587);
-    transporter = nodemailer.createTransport({
-        host: gmailHost,
-        port: gmailPort,
-        secure: gmailPort === 465, // STARTTLS on 587, SSL/TLS on 465
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASSWORD,
-        },
-        connectionTimeout: 15000,
-        greetingTimeout: 10000,
-        socketTimeout: 20000,
-    });
+    transporter = createSmtpTransport({ host: gmailHost, port: gmailPort });
     }
 
     return transporter;
@@ -222,7 +239,40 @@ const sendEmail = async ({to,subject,html,text}) => {
       // #region agent log
       fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:catch',message:'SMTP send failed',data:{errorCode:error?.code||null,errorResponseCode:error?.responseCode||null,errorCommand:error?.command||null,errorMessage:error?.message||'unknown'},timestamp:Date.now()})}).catch(()=>{});
       // #endregion
-      throw error;
+      const isIpv6RouteIssue =
+        error?.code === "ENETUNREACH" ||
+        String(error?.message || "").includes("ENETUNREACH");
+
+      if (nodeEnv !== "development" && isIpv6RouteIssue) {
+        const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
+        const gmailPort = Number(process.env.GMAIL_PORT || 587);
+        const ipv4List = await resolve4(gmailHost);
+        const fallbackHost = ipv4List?.[0];
+
+        if (fallbackHost) {
+          // #region agent log
+          fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:ipv4-retry',message:'Retrying SMTP with resolved IPv4 host',data:{gmailHost,fallbackHost,gmailPort},timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+
+          const retryTransporter = createSmtpTransport({
+            host: fallbackHost,
+            port: gmailPort,
+            forceIpv4: true,
+          });
+
+          info = await retryTransporter.sendMail({
+            from: `"${appName}" <${from}>`,
+            to,
+            subject,
+            html,
+            text,
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
     }
 
     console.log(`Email has been sent to ${info.messageId}`);
