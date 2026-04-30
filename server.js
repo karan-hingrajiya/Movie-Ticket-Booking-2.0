@@ -1,5 +1,5 @@
+import "dotenv/config"; // Load .env before importing modules that read process.env
 import app from "./src/app.js";
-import "dotenv/config"; //immidiately execute kar do dotenv.config()
 import { connectDB } from "./src/common/config/db.js";
 import initDB from "./src/common/config/db/init.js";
 import { initSchema } from "./src/module/movie-ticket-booking/booking.model.js";

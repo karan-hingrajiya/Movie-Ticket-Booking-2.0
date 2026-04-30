@@ -1,17 +1,15 @@
 import nodemailer from "nodemailer";
-import dns from "node:dns";
 import ApiError from "../utils/api-error.js";
-import { promisify } from "node:util";
 
 let transporter;
 const nodeEnv = process.env.NODE_ENV || process.env.NODE_env || "development";
+const mailProvider = (
+  process.env.MAIL_PROVIDER ||
+  (nodeEnv === "development" ? "mailtrap" : "brevo")
+).toLowerCase();
 
 const appName = process.env.APP_NAME || "ZohoCine";
-const resolve4 = promisify(dns.resolve4);
-
-// Render instances can hit IPv6 SMTP reachability issues.
-// Prefer IPv4 lookups to avoid ENETUNREACH on smtp.gmail.com.
-dns.setDefaultResultOrder("ipv4first");
+const isApiProvider = ["api", "brevo-api", "brevo_api"].includes(mailProvider);
 
 const getAppUrl = () => {
     return process.env.APP_URL || `http://localhost:${process.env.PORT || 5000}`;
@@ -152,53 +150,80 @@ If you did not request a password reset, you can ignore this email.
     };
 };
 
-const createSmtpTransport = ({ host, port, forceIpv4 = false }) => {
-  const secure = Number(port) === 465;
-  const baseConfig = {
+const createSmtpTransport = ({ host, port, user, pass }) =>
+  nodemailer.createTransport({
     host,
     port: Number(port),
-    secure, // STARTTLS on 587, SSL/TLS on 465
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASSWORD,
-    },
+    secure: Number(port) === 465, // STARTTLS on 587, SSL/TLS on 465
+    auth: { user, pass },
     connectionTimeout: 15000,
     greetingTimeout: 10000,
     socketTimeout: 20000,
-  };
+  });
 
-  if (!forceIpv4) {
-    return nodemailer.createTransport(baseConfig);
+const sendWithBrevoApi = async ({ to, subject, html, text }) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.MAIL_FROM || process.env.BREVO_SENDER_EMAIL || process.env.BREVO_USER;
+
+  if (!apiKey) {
+    throw ApiError.badRequest("BREVO_API_KEY is required");
   }
 
-  return nodemailer.createTransport({
-    ...baseConfig,
-    // Keep TLS host validation against Gmail host while connecting to IPv4 address.
-    tls: { servername: process.env.GMAIL_HOST || "smtp.gmail.com" },
+  if (!senderEmail) {
+    throw ApiError.badRequest("MAIL_FROM or BREVO_SENDER_EMAIL is required");
+  }
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "content-type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify({
+      sender: { name: appName, email: senderEmail },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+      textContent: text,
+    }),
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw ApiError.badRequest(`Brevo API send failed: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  console.log(`Email has been sent to ${data?.messageId || to}`);
 };
 
 const getTransporter = () => {
 
     if(transporter) return transporter;
-
-    // #region agent log
-    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H1',location:'mail.js:getTransporter',message:'Choosing transporter branch',data:{nodeEnv,hasMailtrapUser:Boolean(process.env.MAILTRAP_USER),hasGmailUser:Boolean(process.env.GMAIL_USER),gmailHost:process.env.GMAIL_HOST||null,gmailPort:process.env.GMAIL_PORT||null},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-
-    if (nodeEnv === "development") {
-    transporter = nodemailer.createTransport({
+    if (isApiProvider) return null;
+    if (mailProvider === "mailtrap") {
+      transporter = createSmtpTransport({
         host: process.env.MAILTRAP_HOST,
-        port: Number(process.env.MAILTRAP_PORT),
-            auth: {
-                user: process.env.MAILTRAP_USER,
-                pass: process.env.MAILTRAP_PASSWORD,
-            },
-        });
+        port: process.env.MAILTRAP_PORT,
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASSWORD,
+      });
+    } else if (mailProvider === "gmail") {
+      transporter = createSmtpTransport({
+        host: process.env.GMAIL_HOST || "smtp.gmail.com",
+        port: process.env.GMAIL_PORT || 587,
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASSWORD,
+      });
     } else {
-    const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
-    const gmailPort = Number(process.env.GMAIL_PORT || 587);
-    transporter = createSmtpTransport({ host: gmailHost, port: gmailPort });
+      // Recommended production default (Brevo free tier).
+      transporter = createSmtpTransport({
+        host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
+        port: process.env.BREVO_PORT || 587,
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASSWORD,
+      });
     }
 
     return transporter;
@@ -206,6 +231,12 @@ const getTransporter = () => {
 
 const verifyTransporter = async () => {
     try {
+        if (isApiProvider) {
+          if (!process.env.BREVO_API_KEY) {
+            throw ApiError.badRequest("BREVO_API_KEY is required");
+          }
+          return;
+        }
         await getTransporter().verify();
         console.log("Server is ready to take our messages");
     } catch (error) {
@@ -214,98 +245,25 @@ const verifyTransporter = async () => {
 }
 
 const sendEmail = async ({to,subject,html,text}) => {
-    const from =
-      nodeEnv === "development"
-        ? process.env.MAIL_FROM || process.env.MAILTRAP_USER || process.env.GMAIL_USER
-        : process.env.GMAIL_USER || process.env.MAIL_FROM || process.env.MAILTRAP_USER;
-    const toDomain = String(to || "").split("@")[1] || "unknown";
-    const fromDomain = String(from || "").split("@")[1] || "unknown";
-    const transportPort = Number(process.env.GMAIL_PORT || process.env.MAILTRAP_PORT || 0);
-
-    // #region agent log
-    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H3',location:'mail.js:sendEmail',message:'About to send email',data:{nodeEnv,fromDomain,toDomain,subjectType:subject?.includes('Verify')?'verify':'other',secure:transportPort===465,port:transportPort},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-
-    let info;
-    try {
-      info = await getTransporter().sendMail({
-          from : `"${appName}" <${from}>`,
-          to,
-          subject,
-          html,
-          text,
-      });
-    } catch (error) {
-      // #region agent log
-      fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:catch',message:'SMTP send failed',data:{errorCode:error?.code||null,errorResponseCode:error?.responseCode||null,errorCommand:error?.command||null,errorMessage:error?.message||'unknown'},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
-      const isIpv6RouteIssue =
-        error?.code === "ENETUNREACH" ||
-        String(error?.message || "").includes("ENETUNREACH");
-      const isTimeoutIssue =
-        error?.code === "ETIMEDOUT" ||
-        String(error?.message || "").toLowerCase().includes("timeout");
-
-      if (nodeEnv !== "development" && isIpv6RouteIssue) {
-        const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
-        const gmailPort = Number(process.env.GMAIL_PORT || 587);
-        const ipv4List = await resolve4(gmailHost);
-        const fallbackHost = ipv4List?.[0];
-
-        if (fallbackHost) {
-          // #region agent log
-          fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:ipv4-retry',message:'Retrying SMTP with resolved IPv4 host',data:{gmailHost,fallbackHost,gmailPort},timestamp:Date.now()})}).catch(()=>{});
-          // #endregion
-
-          const retryTransporter = createSmtpTransport({
-            host: fallbackHost,
-            port: gmailPort,
-            forceIpv4: true,
-          });
-
-          info = await retryTransporter.sendMail({
-            from: `"${appName}" <${from}>`,
-            to,
-            subject,
-            html,
-            text,
-          });
-        } else {
-          throw error;
-        }
-      } else if (nodeEnv !== "development" && isTimeoutIssue) {
-        const gmailHost = process.env.GMAIL_HOST || "smtp.gmail.com";
-        const configuredPort = Number(process.env.GMAIL_PORT || 587);
-        const fallbackPort = configuredPort === 587 ? 465 : 587;
-        const ipv4List = await resolve4(gmailHost).catch(() => []);
-        const retryHost = ipv4List?.[0] || gmailHost;
-
-        // #region agent log
-        fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H2',location:'mail.js:sendEmail:timeout-retry',message:'Retrying SMTP on alternate port after timeout',data:{gmailHost,retryHost,configuredPort,fallbackPort},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-
-        const retryTransporter = createSmtpTransport({
-          host: retryHost,
-          port: fallbackPort,
-          forceIpv4: retryHost !== gmailHost,
-        });
-
-        info = await retryTransporter.sendMail({
-          from: `"${appName}" <${from}>`,
-          to,
-          subject,
-          html,
-          text,
-        });
-      } else {
-        throw error;
-      }
+    if (isApiProvider) {
+      await sendWithBrevoApi({ to, subject, html, text });
+      return;
     }
 
+    const from =
+      mailProvider === "mailtrap"
+        ? process.env.MAILTRAP_USER
+        : mailProvider === "gmail"
+          ? process.env.GMAIL_USER
+          : process.env.BREVO_USER;
+    const info = await getTransporter().sendMail({
+        from : `"${appName}" <${from}>`,
+        to,
+        subject,
+        html,
+        text,
+    });
     console.log(`Email has been sent to ${info.messageId}`);
-    // #region agent log
-    fetch('http://127.0.0.1:7488/ingest/4ff8f0e1-798e-4a48-be92-e8f365b4b782',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'933761'},body:JSON.stringify({sessionId:'933761',runId:'mail-debug-1',hypothesisId:'H4',location:'mail.js:sendEmail:success',message:'SMTP send succeeded',data:{messageId:info?.messageId||null},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
 }
 
 const verificationEmail = async (userMail, token) => {
