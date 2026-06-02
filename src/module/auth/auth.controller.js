@@ -19,7 +19,7 @@ export const login = async (req,res) => {
 
   ApiResponse.ok(res, "login successful", {user, accessToken});
 }
-// ! write expire refresh token code what happens when refresh token expires
+
 export const refresh = async (req,res) => {
   const token = req.cookies?.refreshToken;
   const accessToken = await authService.refresh(token);

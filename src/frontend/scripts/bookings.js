@@ -94,6 +94,7 @@ async function fetchMovieDetails() {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
+  
     if (!response.ok) {
       const result = await parseApiResponse(response);
       throw new Error(
